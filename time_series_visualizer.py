@@ -4,6 +4,7 @@ import seaborn as sns
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import calendar
+from datetime import datetime
 
 # Import data (Make sure to parse dates. Consider setting index column to 'date'.)
 df = pd.read_csv('fcc-forum-pageviews.csv', index_col='date', parse_dates=True)
@@ -58,10 +59,26 @@ def draw_box_plot():
     df_box['month'] = [d.strftime('%b') for d in df_box.date]
 
     # Draw box plots (using Seaborn)
+    fig, [ax1, ax2] = plt.subplots(1,2, figsize=(20,8))
 
+    sns.boxplot(data=df_box, 
+                x='year', 
+                y='value', 
+                ax=ax1);
+    ax1.set_xlabel('Year')
+    ax1.set_ylabel('Page Views')
+    ax1.set_title('Year-wise Box Plot (Trend)')
+    ax1.set_yticks(np.arange(0, max(df_box['value'])+40000, 20000))
 
-
-
+    sns.boxplot(data=df_box, 
+                x='month', 
+                y='value',
+                order=sorted(df_box['month'].unique(), key=lambda m: datetime.strptime(m, "%b")),
+                ax=ax2);
+    ax2.set_xlabel('Months')
+    ax2.set_ylabel('Page Views')
+    ax2.set_title('Month-wise Box Plot (Seasonality)')
+    ax2.set_yticks(np.arange(0, max(df_box['value'])+40000, 20000));
 
     # Save image and return fig (don't change this part)
     fig.savefig('box_plot.png')
